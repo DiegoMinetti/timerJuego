@@ -1,45 +1,9 @@
-
-// Importing necessary libraries and assets
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
-
 import { useState, useEffect, useRef } from 'react';
 import './App.css';
 
 const DEFAULT_SECONDS = 10;
 const DEFAULT_BG = '#1976d2';
 const RED = '#d32f2f';
-const SOUND_URL = 'https://cdn.pixabay.com/audio/2022/10/16/audio_12b6b1b2e7.mp3'; // Placeholder, replace if needed
 
 function TimerJuego() {
   const [seconds, setSeconds] = useState(DEFAULT_SECONDS);
@@ -56,23 +20,14 @@ function TimerJuego() {
       let flashInterval;
       setBgColor(RED);
       if (navigator.vibrate) navigator.vibrate([300, 100, 300]);
+      // Reproducir loose.wav solo una vez
+      if (audioRef.current) {
+        audioRef.current.currentTime = 0;
+        audioRef.current.play();
+      }
       // Parpadeo entre rojo y blanco cada 400ms durante 5s
       flashInterval = setInterval(() => {
-        setBgColor(prev => prev === RED ? '#fff' : RED);
-        // Beep de tono descendente
-        const context = new (window.AudioContext || window.webkitAudioContext)();
-        const oscillator = context.createOscillator();
-        const gain = context.createGain();
-        // De agudo a grave: 1200Hz a 400Hz
-        const freq = 1200 - flashCount * ((1200-400)/12);
-        oscillator.type = 'sine';
-        oscillator.frequency.value = freq;
-        gain.gain.value = 0.2;
-        oscillator.connect(gain);
-        gain.connect(context.destination);
-        oscillator.start();
-        oscillator.stop(context.currentTime + 0.18);
-        oscillator.onended = () => context.close();
+        setBgColor(prev => prev === RED ? DEFAULT_BG : RED);
         flashCount++;
         if (flashCount >= 12) { // 12*400ms ≈ 4800ms
           clearInterval(flashInterval);
@@ -92,6 +47,12 @@ function TimerJuego() {
     let started = false;
     const handleTouch = () => {
       if (!started && !running) {
+        // Intentar reproducir el audio para desbloquearlo en iOS/Safari
+        if (audioRef.current) {
+          audioRef.current.play().catch(() => {});
+          audioRef.current.pause();
+          audioRef.current.currentTime = 0;
+        }
         setRunning(true);
         started = true;
         return;
@@ -100,6 +61,11 @@ function TimerJuego() {
       setBgColor(DEFAULT_BG);
       setFlash(false);
       setRunning(true);
+      // Detener sonido si está reproduciéndose
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
     };
     window.addEventListener('touchstart', handleTouch);
     window.addEventListener('mousedown', handleTouch);
@@ -122,7 +88,7 @@ function TimerJuego() {
         transition: 'background 0.2s',
       }}
     >
-  {/* El sonido ahora se genera con Web Audio API */}
+    <audio ref={audioRef} src="/timerJuego/loose.wav" preload="auto" />
       <div style={{
         fontSize: '5rem',
         color: '#fff',
@@ -146,7 +112,14 @@ function TimerJuego() {
           opacity: running ? 1 : 0.5,
           pointerEvents: running ? 'auto' : 'none',
         }}
-        onClick={() => setRunning(false)}
+        onClick={() => {
+          setRunning(false);
+          // Detener sonido si está reproduciéndose
+          if (audioRef.current) {
+            audioRef.current.pause();
+            audioRef.current.currentTime = 0;
+          }
+        }}
         disabled={!running || seconds === 0}
       >
         Detener
