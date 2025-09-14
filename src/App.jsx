@@ -43,7 +43,7 @@ const SOUND_URL = 'https://cdn.pixabay.com/audio/2022/10/16/audio_12b6b1b2e7.mp3
 
 function TimerJuego() {
   const [seconds, setSeconds] = useState(DEFAULT_SECONDS);
-  const [running, setRunning] = useState(true);
+  const [running, setRunning] = useState(false);
   const [bgColor, setBgColor] = useState(DEFAULT_BG);
   const [flash, setFlash] = useState(false);
   const timerRef = useRef();
@@ -89,7 +89,13 @@ function TimerJuego() {
 
   // Reiniciar temporizador al tocar pantalla
   useEffect(() => {
+    let started = false;
     const handleTouch = () => {
+      if (!started && !running) {
+        setRunning(true);
+        started = true;
+        return;
+      }
       setSeconds(DEFAULT_SECONDS);
       setBgColor(DEFAULT_BG);
       setFlash(false);
@@ -101,7 +107,7 @@ function TimerJuego() {
       window.removeEventListener('touchstart', handleTouch);
       window.removeEventListener('mousedown', handleTouch);
     };
-  }, []);
+  }, [running]);
 
   return (
     <div
@@ -146,9 +152,11 @@ function TimerJuego() {
         Detener
       </button>
       <div style={{marginTop: '2rem', color: '#fff', fontSize: '1rem'}}>
-        {seconds === 0
-          ? 'Toca la pantalla para reiniciar el temporizador'
-          : 'Toca la pantalla para reiniciar (solo si perdiste)'}
+        {!running
+          ? 'Toca la pantalla para iniciar el temporizador'
+          : seconds === 0
+            ? 'Toca la pantalla para reiniciar el temporizador'
+            : 'Toca la pantalla para reiniciar (solo si perdiste)'}
       </div>
     </div>
   );
