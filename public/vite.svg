@@ -2,7 +2,5 @@
 	<rect width="64" height="64" rx="16" fill="#1976d2"/>
 	<g>
 		<path d="M20 10h24c2 0 3 2 2 4l-10 12c-2 2-2 6 0 8l10 12c1 2 0 4-2 4H20c-2 0-3-2-2-4l10-12c2-2 2-6 0-8L18 14c-1-2 0-4 2-4z" fill="#fff" stroke="#1565c0" stroke-width="2"/>
-		<ellipse cx="32" cy="32" rx="6" ry="3" fill="#ffd600"/>
-		<rect x="29" y="35" width="6" height="10" rx="3" fill="#ffd600"/>
 	</g>
 </svg>

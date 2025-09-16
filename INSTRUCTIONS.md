@@ -18,7 +18,12 @@
 
 ## Configuración del temporizador
 
-- Para cambiar los segundos iniciales, edita la variable `DEFAULT_SECONDS` en `src/App.jsx`.
+- Desde la interfaz: cuando el temporizador está detenido, pulsa el botón "Configuración" y establece los segundos deseados. Se guardará en este dispositivo.
+- Avanzado: la configuración se guarda como JSON en `localStorage` con la clave `timerJuego:config`. Estructura actual:
+   - `{"seconds": number, "soundsEnabled": boolean}`
+      - `seconds`: rango 1–600
+      - `soundsEnabled`: habilita/deshabilita los sonidos (tic y fin)
+   A futuro se agregarán más opciones aquí.
 
 ## Deploy en GitHub Pages
 
